@@ -32,19 +32,23 @@ var styles = StyleSheet.create({
   buttonText: {
     fontSize: 18,
     color: 'white',
-    alignSelf: 'center'
+    alignSelf: 'center',
+    marginTop: 3
+  },
+  buttonsContainer:{
+    flex:1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch'
   },
   button: {
-    height: 36,
-    flex: 1,
-    flexDirection: 'row',
+    height: 30,
+    flex: 0.5,
     backgroundColor: '#48BBEC',
     borderColor: '#48BBEC',
     borderWidth: 1,
     borderRadius: 8,
-    marginBottom: 10,
-    alignSelf: 'stretch',
-    justifyContent: 'center'
+    marginLeft:20
   },
   searchInput: {
     height: 36,
@@ -71,8 +75,13 @@ class AddListing extends Component{
     this.setState({ searchString: event.nativeEvent.text });
   }
 
+  onCancelPressed(){
+    this.props.navigator.pop();
+  }
+
   onSearchPressed(){
-    console.log('pressed');
+    //this.props.navigator.pop();
+    this.props.onAddListing({'id':4, 'address': '92 N 7th Street', 'city': 'San Jose', 'state': 'CA','lat': 38.7411761, 'lng': -85.8122836, distance:0});
   }
   render() {
     return (
@@ -93,12 +102,19 @@ class AddListing extends Component{
               placeholder='State'
               value=''
               onChange={this.onSearchTextChanged.bind(this)}/>
-            <TouchableHighlight style={styles.button}
-                underlayColor='#99d9f4'
-                onPress={this.onSearchPressed.bind(this)}>
-              <Text style={styles.buttonText}>Go</Text>
-            </TouchableHighlight>
           </View>
+          <View style={styles.buttonsContainer}>
+              <TouchableHighlight style={styles.button}
+                  underlayColor='#99d9f4'
+                  onPress={this.onSearchPressed.bind(this)}>
+                <Text style={styles.buttonText}>ADD</Text>
+              </TouchableHighlight>
+              <TouchableHighlight style={styles.button}
+                  underlayColor='#99d9f4'
+                  onPress={this.onCancelPressed.bind(this)}>
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableHighlight>
+            </View>
         </View>
     );
   }
