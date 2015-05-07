@@ -8,7 +8,8 @@ var _ = require('lodash');
 var {
   AsyncStorage,
   NavigatorIOS,
-  AppRegistry
+  AppRegistry,
+  AlertIOS
 } = React;
 
 var styles = React.StyleSheet.create({
@@ -17,37 +18,39 @@ var styles = React.StyleSheet.create({
   }
 });
 
-var data = [{'id':0, 'address': '1043 Dale Ave', 'city': 'Mountain View', 'state': 'CA','lat': 37.374082, 'lng': -122.062983, distance:0},
-    {'id':1, 'address': '3158 Emerson St', 'city': 'Palo Alto', 'state': 'CA','lat': 37.42286, 'lng': -122.129873, distance:0},
-    {'id':2, 'address': '410 N Mary Ave', 'city': 'Sunnyvale', 'state': 'CA','lat': 37.3894263, 'lng': -122.0405288, distance:0},
-    {'id':3, 'address': '25 South 6th Street', 'city': 'Austin', 'state': 'TX','lat': 38.7411761, 'lng': -85.8122836, distance:0}];
+// var data = [{'id':0, 'address': '1043 Dale Ave', 'city': 'Mountain View', 'state': 'CA','lat': 37.374082, 'lng': -122.062983, distance:0},
+//     {'id':1, 'address': '3158 Emerson St', 'city': 'Palo Alto', 'state': 'CA','lat': 37.42286, 'lng': -122.129873, distance:0},
+//     {'id':2, 'address': '410 N Mary Ave', 'city': 'Sunnyvale', 'state': 'CA','lat': 37.3894263, 'lng': -122.0405288, distance:0},
+//     {'id':3, 'address': '25 South 6th Street', 'city': 'Austin', 'state': 'TX','lat': 38.7411761, 'lng': -85.8122836, distance:0}];
 
-AsyncStorage.setItem('listings', JSON.stringify(data))
-  .then(() => AsyncStorage.getItem('listings')
-  .then((value) => console.log(value)))
-  .done();
+// AsyncStorage.setItem('listings', JSON.stringify(data))
+//   .then(() => AsyncStorage.getItem('listings')
+//   .then((value) => console.log(value)))
+//   .done();
 
 
 class OpenHouseApp extends React.Component {
 
   constructor(props){
     super(props);
-    this.state = {listings:data};
-    AsyncStorage.getItem('listings')
-      .then((value) => this.state = {listings:JSON.parse(value)})
-      .done();
-    
-    this.initialRoute = {
+    this.state = {
       title: 'Listings',
       component: Listings,
-      passProps: this.state,
+      passProps: {listings: []},
+      listings: [],
       rightButtonTitle: '+',
       onRightButtonPress: this.addListingView.bind(this)
     };
   }
 
   componentDidMount(){
-    this.startWatch();
+    AsyncStorage.getItem('listings')
+      .then((value) => {
+        this.state.listings = JSON.parse(value);
+        this.state.passProps = {listings: this.state.listings};
+        this.redrawListings(true);
+      })
+      .done();
   }
 
   componentWillUnmount(){
@@ -60,15 +63,16 @@ class OpenHouseApp extends React.Component {
       return cur;
     });
     this.state.watchID = this.watchID;
+    this.state.passProps = {listings: this.state.listings};
     this.redrawListings(false);
   }
 
   onAddListing(listing){
-    this.refs.nav.pop();
     this.state.listings.push(listing);
-    //It will call render but will not call render of Listings class
-    //this.setState(this.state);
-    //Replacing View still keeps the old state because of refs.nav.pop()???
+    this.state.passProps = {listings: this.state.listings};
+    AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
+      .done();
+    //this.refs.nav.pop();
     this.redrawListings(true);
   }
 
@@ -89,8 +93,11 @@ class OpenHouseApp extends React.Component {
     });
   }
 
+  //Why is not redrawing?????
   redrawListings(startWatch){
-    this.refs.nav.replace(this.initialRoute);
+    //AlertIOS.alert('listings '+ this.state.listings.length);
+    //this.refs.nav.pop();
+    this.refs.nav.replace(this.state);
     if(startWatch){
       this.startWatch();
     }
@@ -101,7 +108,7 @@ class OpenHouseApp extends React.Component {
       <NavigatorIOS
         style={styles.container}
         ref="nav"
-        initialRoute={this.initialRoute}/>
+        initialRoute={this.state}/>
     );
   }
 }
