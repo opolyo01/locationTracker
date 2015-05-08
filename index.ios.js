@@ -46,9 +46,9 @@ class OpenHouseApp extends React.Component {
     navigator.geolocation.clearWatch(this.watchID);
   }
 
-  _updateDistances(curLat, curLon){
-    _.map(this.state.listings, function(cur){
-      cur.distance = utils.calcCrow(cur.lat, cur.lng, curLat, curLon);
+  _updateDistances(){
+    _.map(this.state.listings, cur => {
+      cur.distance = utils.calcCrow(cur.lat, cur.lng, this.curLat, this.curLon);
       return cur;
     });
     this.state.watchID = this.watchID;
@@ -69,6 +69,9 @@ class OpenHouseApp extends React.Component {
 
   onAddListing(listing){
     listing.id = this.state.listings.length + 1;
+    listing.distance = utils.calcCrow(listing.lat, 
+        listing.lng, this.curLat, this.curLon);
+    
     this.state.listings.push(listing);
     this.state.passProps.listings = this.state.listings;
     AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
@@ -88,9 +91,9 @@ class OpenHouseApp extends React.Component {
 
   startWatch(){
     this.watchID = navigator.geolocation.watchPosition((lastPosition) => {
-      var curLat = lastPosition.coords.latitude;
-      var curLon = lastPosition.coords.longitude;
-      this._updateDistances(curLat, curLon);
+      this.curLat = lastPosition.coords.latitude;
+      this.curLon = lastPosition.coords.longitude;
+      this._updateDistances();
     });
   }
 

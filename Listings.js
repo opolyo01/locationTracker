@@ -127,7 +127,7 @@ class Listings extends Component{
               <TouchableHighlight style={styles.button}
                   underlayColor='#99d9f4'
                   onPress={this.rowPressed.bind(this, rowData.id)}>
-                <Text style={styles.buttonText}>?</Text>
+                <Text style={styles.buttonText}>i</Text>
               </TouchableHighlight>
             </View>
           </View>

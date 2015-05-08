@@ -9,6 +9,7 @@ var {
   View,
   TouchableHighlight,
   TextInput,
+  ActivityIndicatorIOS,
   Text
 } = React;
 
@@ -17,7 +18,7 @@ var styles = StyleSheet.create({
     marginBottom: 20,
     fontSize: 18,
     textAlign: 'center',
-    color: '#656565'
+    color: 'red'
   },
   container: {
     padding: 30,
@@ -64,11 +65,29 @@ var styles = StyleSheet.create({
   }
 });
 
+function urlForQueryAndPage(address) {
+  var data = {
+      sensor: 'false',
+      address: address
+  };
+
+  var querystring = Object.keys(data)
+    .map(key => key + '=' + encodeURIComponent(data[key]))
+    .join('&');
+  return 'http://maps.google.com/maps/api/geocode/json?' + querystring;
+}
 
 class AddListing extends Component{
   
   constructor(props){
     super(props);
+    this.state = {
+      addressString: '',
+      cityString: '',
+      stateString: '',
+      isLoading: false,
+      message: ''
+    };
   }
 
   onAddressTextChanged(event) {
@@ -88,17 +107,40 @@ class AddListing extends Component{
   }
 
   onAddPressed(){
-    this.props.onAddListing({
-      'address': this.state.addressString,
-      'city': this.state.cityString,
-      'state': this.state.stateString,
-      'lat': 38.7411761,
-      'lng': -85.8122836,
-      'distance': 0
-    });
+    this.setState({ isLoading: true, message: '' });
+    var queryAddress = this.state.addressString + 
+              this.state.cityString + this.state.stateString;
+    var query = urlForQueryAndPage(queryAddress);
+
+    fetch(query)
+      .then(response => response.json())
+      .then(json => {
+        var lat = json.results[0].geometry.location.lat;
+        var lng = json.results[0].geometry.location.lng;
+
+        this.props.onAddListing({
+          'address': this.state.addressString,
+          'city': this.state.cityString,
+          'state': this.state.stateString,
+          'lat': lat,
+          'lng': lng
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        this.setState({
+          isLoading: false,
+          message: 'Invalid Address Entered '
+        });
+      });
   }
 
   render() {
+    var spinner = this.state.isLoading ?
+      ( <ActivityIndicatorIOS
+          hidden='true'
+          size='large'/> ) :
+      ( <View/>);
     return (
       <View style={styles.container}>
         <View style={styles.flowRight}>
@@ -118,6 +160,8 @@ class AddListing extends Component{
               value=''
               onChange={this.onStateTextChanged.bind(this)}/>
           </View>
+          {spinner}
+          <Text style={styles.description}>{this.state.message}</Text>
           <View style={styles.buttonsContainer}>
               <TouchableHighlight style={styles.button}
                   underlayColor='#99d9f4'
