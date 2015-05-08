@@ -18,16 +18,6 @@ var styles = React.StyleSheet.create({
   }
 });
 
-// var data = [{'id':0, 'address': '1043 Dale Ave', 'city': 'Mountain View', 'state': 'CA','lat': 37.374082, 'lng': -122.062983, distance:0},
-//     {'id':1, 'address': '3158 Emerson St', 'city': 'Palo Alto', 'state': 'CA','lat': 37.42286, 'lng': -122.129873, distance:0},
-//     {'id':2, 'address': '410 N Mary Ave', 'city': 'Sunnyvale', 'state': 'CA','lat': 37.3894263, 'lng': -122.0405288, distance:0},
-//     {'id':3, 'address': '25 South 6th Street', 'city': 'Austin', 'state': 'TX','lat': 38.7411761, 'lng': -85.8122836, distance:0}];
-
-// AsyncStorage.setItem('listings', JSON.stringify(data))
-//   .then(() => AsyncStorage.getItem('listings')
-//   .then((value) => console.log(value)))
-//   .done();
-
 
 class OpenHouseApp extends React.Component {
 
@@ -36,8 +26,7 @@ class OpenHouseApp extends React.Component {
     this.state = {
       title: 'Listings',
       component: Listings,
-      passProps: {listings: []},
-      listings: [],
+      passProps: {listings: [], onDeleteListing: this.onDeleteListing.bind(this)},
       rightButtonTitle: '+',
       onRightButtonPress: this.addListingView.bind(this)
     };
@@ -46,8 +35,8 @@ class OpenHouseApp extends React.Component {
   componentDidMount(){
     AsyncStorage.getItem('listings')
       .then((value) => {
-        this.state.listings = JSON.parse(value);
-        this.state.passProps = {listings: this.state.listings};
+        this.state.listings = value?JSON.parse(value):[];
+        this.state.passProps.listings = this.state.listings;
         this.redrawListings(true);
       })
       .done();
@@ -63,16 +52,28 @@ class OpenHouseApp extends React.Component {
       return cur;
     });
     this.state.watchID = this.watchID;
-    this.state.passProps = {listings: this.state.listings};
+    this.state.passProps.listings = this.state.listings;
+    this.state.passProps.watchID = this.state.watchID;
     this.redrawListings(false);
   }
 
-  onAddListing(listing){
-    this.state.listings.push(listing);
-    this.state.passProps = {listings: this.state.listings};
+  onDeleteListing(id){
+    this.state.listings = this.state.listings
+      .filter(prop => prop.id !== id);
+    this.state.passProps.listings = this.state.listings;
+
     AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
       .done();
-    //this.refs.nav.pop();
+    this.redrawListings(true);
+  }
+
+  onAddListing(listing){
+    listing.id = this.state.listings.length + 1;
+    this.state.listings.push(listing);
+    this.state.passProps.listings = this.state.listings;
+    AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
+      .done();
+    this.refs.nav.pop();
     this.redrawListings(true);
   }
 
@@ -93,10 +94,7 @@ class OpenHouseApp extends React.Component {
     });
   }
 
-  //Why is not redrawing?????
   redrawListings(startWatch){
-    //AlertIOS.alert('listings '+ this.state.listings.length);
-    //this.refs.nav.pop();
     this.refs.nav.replace(this.state);
     if(startWatch){
       this.startWatch();

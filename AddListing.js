@@ -50,7 +50,7 @@ var styles = StyleSheet.create({
     borderRadius: 8,
     marginLeft:20
   },
-  searchInput: {
+  addInput: {
     height: 36,
     padding: 4,
     marginRight: 5,
@@ -71,48 +71,58 @@ class AddListing extends Component{
     super(props);
   }
 
-  onSearchTextChanged(event) {
-    this.setState({ searchString: event.nativeEvent.text });
+  onAddressTextChanged(event) {
+    this.setState({ addressString: event.nativeEvent.text });
+  }
+
+  onCityTextChanged(event) {
+    this.setState({ cityString: event.nativeEvent.text });
+  }
+
+  onStateTextChanged(event) {
+    this.setState({ stateString: event.nativeEvent.text });
   }
 
   onCancelPressed(){
     this.props.navigator.pop();
   }
 
-  onSearchPressed(){
-    //this.props.navigator.pop();
-    this.props.onAddListing({'id':4, 'address': '92 N 7th Street', 'city': 'San Jose', 'state': 'CA','lat': 38.7411761, 'lng': -85.8122836, distance:0});
+  onAddPressed(){
+    this.props.onAddListing({
+      'address': this.state.addressString,
+      'city': this.state.cityString,
+      'state': this.state.stateString,
+      'lat': 38.7411761,
+      'lng': -85.8122836,
+      'distance': 0
+    });
   }
+
   render() {
     return (
       <View style={styles.container}>
         <View style={styles.flowRight}>
             <TextInput
-              style={styles.searchInput}
+              style={styles.addInput}
               placeholder='Address'
               value=''
-              onChange={this.onSearchTextChanged.bind(this)}/>
+              onChange={this.onAddressTextChanged.bind(this)}/>
             <TextInput
-              style={styles.searchInput}
+              style={styles.addInput}
               placeholder='City'
               value=''
-              onChange={this.onSearchTextChanged.bind(this)}/>
+              onChange={this.onCityTextChanged.bind(this)}/>
             <TextInput
-              style={styles.searchInput}
+              style={styles.addInput}
               placeholder='State'
               value=''
-              onChange={this.onSearchTextChanged.bind(this)}/>
+              onChange={this.onStateTextChanged.bind(this)}/>
           </View>
           <View style={styles.buttonsContainer}>
               <TouchableHighlight style={styles.button}
                   underlayColor='#99d9f4'
-                  onPress={this.onSearchPressed.bind(this)}>
+                  onPress={this.onAddPressed.bind(this)}>
                 <Text style={styles.buttonText}>ADD</Text>
-              </TouchableHighlight>
-              <TouchableHighlight style={styles.button}
-                  underlayColor='#99d9f4'
-                  onPress={this.onCancelPressed.bind(this)}>
-                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableHighlight>
             </View>
         </View>
