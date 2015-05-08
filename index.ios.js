@@ -18,6 +18,15 @@ var styles = React.StyleSheet.create({
   }
 });
 
+function guid() {
+  function s4() {
+    return Math.floor((1 + Math.random()) * 0x10000)
+      .toString(16)
+      .substring(1);
+  }
+  return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+    s4() + '-' + s4() + s4() + s4();
+}
 
 class OpenHouseApp extends React.Component {
 
@@ -64,11 +73,12 @@ class OpenHouseApp extends React.Component {
 
     AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
       .done();
-    this.redrawListings(true);
+    this.redrawListings(false);
   }
 
   onAddListing(listing){
-    listing.id = this.state.listings.length + 1;
+    listing.id = guid();
+    console.log(listing.id);
     listing.distance = utils.calcCrow(listing.lat, 
         listing.lng, this.curLat, this.curLon);
     
