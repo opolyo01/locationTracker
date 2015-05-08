@@ -1,6 +1,7 @@
 'use strict';
 
 var React = require('react-native');
+var NavigationBar = require('react-native-navbar');
 var Listings = require('./Listings');
 var AddListing = require('./AddListing');
 var utils = require('./utils');
@@ -28,15 +29,22 @@ function guid() {
     s4() + '-' + s4() + s4() + s4();
 }
 
+OpenHouseApp = _.extend(OpenHouseApp, {
+  title :'Listings',
+  rightButtonTitle: '+',
+  leftButtonTitle: '='
+});
+
 class OpenHouseApp extends React.Component {
 
   constructor(props){
     super(props);
     this.state = {
-      title: 'Listings',
+      title: OpenHouseApp.title,
       component: Listings,
       passProps: {listings: [], onDeleteListing: this.onDeleteListing.bind(this)},
-      rightButtonTitle: '+',
+      rightButtonTitle: OpenHouseApp.rightButtonTitle,
+      leftButtonTitle: OpenHouseApp.leftButtonTitle,
       onRightButtonPress: this.addListingView.bind(this)
     };
   }
@@ -123,5 +131,6 @@ class OpenHouseApp extends React.Component {
     );
   }
 }
+
 
 AppRegistry.registerComponent('openHouse', () => OpenHouseApp);
