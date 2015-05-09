@@ -114,7 +114,9 @@ class OpenHouseApp extends React.Component {
       this.curLat = lastPosition.coords.latitude;
       this.curLon = lastPosition.coords.longitude;
       this._updateDistances();
-    });
+    },
+    (error) => console.error(error),
+    {enableHighAccuracy: false, timeout: 10000, maximumAge: 10000});
   }
 
   redrawListings(startWatch){
@@ -133,6 +135,5 @@ class OpenHouseApp extends React.Component {
     );
   }
 }
-
 
 AppRegistry.registerComponent('openHouse', () => OpenHouseApp);

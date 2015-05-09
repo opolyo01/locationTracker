@@ -50,8 +50,13 @@ class Listings extends Component{
     super(props);
     //this.deleteAll();
     var ds = new ListView.DataSource(
-      {rowHasChanged: (r1, r2) => r1 !== r2});
+      {rowHasChanged: this.rowHasChanged.bind(this)});
     this.state = {dataSource: ds.cloneWithRows(props.listings)};
+  }
+
+  rowHasChanged(r1, r2){
+    //console.log(r1.distance, r2.distance);
+    return true;
   }
 
   rowPressed(id) {
@@ -70,6 +75,7 @@ class Listings extends Component{
 
   componentWillReceiveProps(nextProps){
     this.state = {dataSource: this.state.dataSource.cloneWithRows(nextProps.listings)};
+    //console.log(nextProps.listings);
   }
 
   deleteAll(){

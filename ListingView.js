@@ -51,10 +51,10 @@ class ListingView extends Component {
   onLocationPressed(lat, lng){
     console.log(lat, lng);
     //var url = 'comgooglemaps://?center=37.374082,-122.062983';
-    var url = `http://maps.google.com/maps?daddr=${lat},${lng}&saddr=${this.props.lat},${this.props.lng}`;
+    var url = `http://maps.apple.com/maps?daddr=${lat},${lng}&saddr=${this.props.lat},${this.props.lng}`;
     LinkingIOS.canOpenURL(url, (supported) => {
       if (!supported) {
-        AlertIOS.alert('Please install google maps');
+        AlertIOS.alert('Please install google or apple maps');
       } 
       else {
         LinkingIOS.openURL(url);
