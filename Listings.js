@@ -8,50 +8,38 @@ var {
   Component,
   View,
   TouchableHighlight,
-  LinkingIOS,
   ListView,
   AsyncStorage,
   Text
 } = React;
 
 var styles = StyleSheet.create({
-  textContainer: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#dddddd'
-  },
-  address: {
-    fontSize: 18,
-    paddingRight: 10,
-    color: '#656565',
-    flex:0.4
-  },
-  distance:{
-    flex:0.4,
-    marginRight: 10,
-    color: '#1464ED'
+  container: {
+    flex: 1
   },
   rowContainer: {
     flexDirection: 'row',
     padding: 10
   },
-  buttonText: {
-    fontSize: 18,
-    color: 'white',
-    alignSelf: 'center',
-    marginTop: 3
+  textContainer: {
+    flex: 1,
+    flexDirection: 'row'
   },
-  button: {
-    height: 30,
-    width:30,
-    backgroundColor: '#48BBEC',
-    borderColor: '#48BBEC',
-    borderWidth: 1,
-    borderRadius: 8,
-    marginLeft: 5
+  columnContainer: {
+    flex: 0.7,
+    flexDirection: 'column'
+  },
+  address: {
+    fontSize: 14,
+    paddingRight: 10,
+    color: '#656565',
+  },
+  distance:{
+    color: '#1464ED'
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#dddddd'
   }
 });
 
@@ -72,11 +60,12 @@ class Listings extends Component{
 
     navigator.geolocation.clearWatch(this.props.watchID);
     this.props.navigator.push({
-      title: 'Listing',
+      title: listing.address,
       component: ListingView,
-      passProps: {listing: listing}
+      passProps: {listing: listing, 
+            onDeleteListing: this.props.onDeleteListing,
+            lat: this.props.lat, lng: this.props.lng}
     });
-
   }
 
   componentWillReceiveProps(nextProps){
@@ -91,46 +80,18 @@ class Listings extends Component{
       .done();
   }
 
-  onLocationPressed(lat, lng){
-    console.log(lat, lng);
-    //var url = 'comgooglemaps://?center=37.374082,-122.062983';
-    var url = `http://maps.google.com/maps?center=${lat},${lng}`;
-    LinkingIOS.canOpenURL(url, (supported) => {
-      if (!supported) {
-        AlertIOS.alert('Can\'t handle url: ' + url);
-      } 
-      else {
-        LinkingIOS.openURL(url);
-      }
-    });
-  }
-
-  deleteListing(id){
-    console.log(id);
-    this.props.onDeleteListing(id);
-  }
-
   renderRow(rowData, sectionID, rowID) {
     return (
-      <TouchableHighlight onPress={() => this.onLocationPressed(rowData.lat, rowData.lng)}
+      <TouchableHighlight onPress={() => this.rowPressed(rowData.id)}
           underlayColor='#dddddd'>
-        <View>
+        <View tyle={styles.container}>
           <View style={styles.rowContainer}>
-            <View  style={styles.textContainer}>
-              <Text style={styles.address} >{rowData.address} {rowData.city}</Text>
+              <View  style={styles.columnContainer}>
+                <Text style={styles.address} numberOfLines={1}>{rowData.address}</Text>
+                <Text style={styles.address} >{rowData.city}</Text>
+              </View>
               <Text style={styles.distance} numberOfLines={1}>{rowData.distance} mi</Text>
-              <TouchableHighlight style={styles.button}
-                  underlayColor='#99d9f4'
-                  onPress={this.deleteListing.bind(this, rowData.id)}>
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableHighlight>
-              <TouchableHighlight style={styles.button}
-                  underlayColor='#99d9f4'
-                  onPress={this.rowPressed.bind(this, rowData.id)}>
-                <Text style={styles.buttonText}>i</Text>
-              </TouchableHighlight>
             </View>
-          </View>
           <View style={styles.separator}/>
         </View>
       </TouchableHighlight>

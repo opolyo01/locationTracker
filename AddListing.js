@@ -7,6 +7,7 @@ var {
   StyleSheet,
   Component,
   View,
+  ScrollView,
   TouchableHighlight,
   TextInput,
   ActivityIndicatorIOS,
@@ -21,9 +22,8 @@ var styles = StyleSheet.create({
     color: 'red'
   },
   container: {
-    padding: 30,
-    marginTop: 65,
-    alignItems: 'center'
+    flex: 1,
+    margin: 20
   },
   flowRight: {
     flexDirection: 'column',
@@ -36,12 +36,6 @@ var styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 3
   },
-  buttonsContainer:{
-    flex:1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch'
-  },
   button: {
     height: 30,
     flex: 0.5,
@@ -49,7 +43,7 @@ var styles = StyleSheet.create({
     borderColor: '#48BBEC',
     borderWidth: 1,
     borderRadius: 8,
-    marginLeft:20
+    margin:20
   },
   addInput: {
     height: 36,
@@ -106,6 +100,30 @@ class AddListing extends Component{
     this.props.navigator.pop();
   }
 
+  setCurrentPressed(){
+    var query = 'http://maps.google.com/maps/api/geocode/json?latlng=' + 
+        this.props.lat+','+this.props.lng;
+    fetch(query)
+      .then(response => response.json())
+      .then(json => {
+        var address = json.results[0].formatted_address;
+        var arr = address.split(',');
+        this.setState({
+          addressString: arr[0],
+          cityString: arr[1].trim(),
+          stateString: arr[2].trim().split(' ')[0],
+        });
+      })
+      .catch(error => {
+        this.setState({
+          addressString: '',
+          cityString: '',
+          stateString: '',
+        });
+        console.error(error);
+      });
+  }
+
   onAddPressed(){
     this.setState({ isLoading: true, message: '' });
     var queryAddress = this.state.addressString + 
@@ -141,35 +159,39 @@ class AddListing extends Component{
           hidden='true'
           size='large'/> ) :
       ( <View/>);
+    
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.flowRight}>
             <TextInput
               style={styles.addInput}
               placeholder='Address'
-              value=''
+              value={this.state.addressString}
               onChange={this.onAddressTextChanged.bind(this)}/>
             <TextInput
               style={styles.addInput}
               placeholder='City'
-              value=''
+              value={this.state.cityString}
               onChange={this.onCityTextChanged.bind(this)}/>
             <TextInput
               style={styles.addInput}
               placeholder='State'
-              value=''
+              value={this.state.stateString}
               onChange={this.onStateTextChanged.bind(this)}/>
           </View>
           {spinner}
           <Text style={styles.description}>{this.state.message}</Text>
-          <View style={styles.buttonsContainer}>
-              <TouchableHighlight style={styles.button}
+          <TouchableHighlight style={styles.button}
+                underlayColor='#99d9f4'
+                onPress={this.onAddPressed.bind(this)}>
+              <Text style={styles.buttonText}>ADD</Text>
+            </TouchableHighlight>
+            <TouchableHighlight style={styles.button}
                   underlayColor='#99d9f4'
-                  onPress={this.onAddPressed.bind(this)}>
-                <Text style={styles.buttonText}>ADD</Text>
-              </TouchableHighlight>
-            </View>
-        </View>
+                  onPress={this.setCurrentPressed.bind(this)}>
+                <Text style={styles.buttonText}>Set Current Address</Text>
+            </TouchableHighlight>
+        </ScrollView>
     );
   }
 }

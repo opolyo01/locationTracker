@@ -44,7 +44,6 @@ class OpenHouseApp extends React.Component {
       component: Listings,
       passProps: {listings: [], onDeleteListing: this.onDeleteListing.bind(this)},
       rightButtonTitle: OpenHouseApp.rightButtonTitle,
-      leftButtonTitle: OpenHouseApp.leftButtonTitle,
       onRightButtonPress: this.addListingView.bind(this)
     };
   }
@@ -71,6 +70,8 @@ class OpenHouseApp extends React.Component {
     this.state.watchID = this.watchID;
     this.state.passProps.listings = this.state.listings;
     this.state.passProps.watchID = this.state.watchID;
+    this.state.passProps.lat = this.curLat;
+    this.state.passProps.lng = this.curLon;
     this.redrawListings(false);
   }
 
@@ -103,7 +104,8 @@ class OpenHouseApp extends React.Component {
     this.refs.nav.push({
       title: 'Add Listing',
       component: AddListing,
-      passProps: {onAddListing: this.onAddListing.bind(this), onCancelListing: this.redrawListings.bind(this, true)}
+      passProps: {onAddListing: this.onAddListing.bind(this), 
+        lat: this.curLat, lng: this.curLon }
     });
   }
 
