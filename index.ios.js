@@ -104,8 +104,7 @@ class OpenHouseApp extends React.Component {
     this.refs.nav.push({
       title: 'Add Listing',
       component: AddListing,
-      passProps: {onAddListing: this.onAddListing.bind(this), 
-        lat: this.curLat, lng: this.curLon }
+      passProps: {onAddListing: this.onAddListing.bind(this)}
     });
   }
 
@@ -115,8 +114,7 @@ class OpenHouseApp extends React.Component {
       this.curLon = lastPosition.coords.longitude;
       this._updateDistances();
     },
-    (error) => console.error(error),
-    {enableHighAccuracy: false, timeout: 10000, maximumAge: 10000});
+    (error) => console.error(error));
   }
 
   redrawListings(startWatch){

@@ -101,8 +101,19 @@ class AddListing extends Component{
   }
 
   setCurrentPressed(){
+    navigator.geolocation.getCurrentPosition(
+      (initialPosition) => {
+        var lat = initialPosition.coords.latitude;
+        var lng = initialPosition.coords.longitude;
+        this.setLocation(lat, lng);
+      },
+      (error) => console.error(error)
+    );
+  }
+
+  setLocation(lat, lng){
     var query = 'http://maps.google.com/maps/api/geocode/json?latlng=' + 
-        this.props.lat+','+this.props.lng;
+        lat+','+lng;
     fetch(query)
       .then(response => response.json())
       .then(json => {
