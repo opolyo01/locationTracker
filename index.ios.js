@@ -53,7 +53,7 @@ class OpenHouseApp extends React.Component {
       .then((value) => {
         this.state.listings = value?JSON.parse(value):[];
         this.state.passProps.listings = this.state.listings;
-        this.redrawListings(true);
+        this.redrawListings();
       })
       .done();
   }
@@ -72,7 +72,8 @@ class OpenHouseApp extends React.Component {
     this.state.passProps.watchID = this.state.watchID;
     this.state.passProps.lat = this.curLat;
     this.state.passProps.lng = this.curLon;
-    this.redrawListings(false);
+    // AlertIOS.alert('Distance is ');
+    this.redrawListings();
   }
 
   onDeleteListing(id){
@@ -82,7 +83,7 @@ class OpenHouseApp extends React.Component {
 
     AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
       .done();
-    this.redrawListings(false);
+    this.redrawListings();
   }
 
   onAddListing(listing){
@@ -96,7 +97,7 @@ class OpenHouseApp extends React.Component {
     AsyncStorage.setItem('listings', JSON.stringify(this.state.listings))
       .done();
     this.refs.nav.pop();
-    this.redrawListings(true);
+    this.redrawListings();
   }
 
   addListingView(){
@@ -117,11 +118,9 @@ class OpenHouseApp extends React.Component {
     (error) => console.error(error));
   }
 
-  redrawListings(startWatch){
+  redrawListings(){
     this.refs.nav.replace(this.state);
-    if(startWatch){
-      this.startWatch();
-    }
+    this.startWatch();
   }
 
   render() {
